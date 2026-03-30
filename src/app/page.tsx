@@ -11,6 +11,7 @@ interface Project {
   updatedAt: string
   status: 'idle' | 'researching' | 'done'
   files: FileItem[]
+  iterations: ResearchIteration[]
 }
 
 interface FileItem {
@@ -19,38 +20,71 @@ interface FileItem {
   content?: string
 }
 
+interface ResearchIteration {
+  number: number
+  timestamp: string
+  actions: string
+  result: string
+  verdict: 'better' | 'same' | 'worse'
+  whyBetter: string
+  confidence: number
+  keep: boolean
+  tokensUsed: number
+}
+
 // Sample data
 const SAMPLE_FILES: FileItem[] = [
-  { name: 'goal.md', type: 'md' },
-  { name: 'research-log.md', type: 'md' },
-  { name: 'notes.txt', type: 'txt' },
-  { name: 'game-physics.js', type: 'code' },
+  { name: 'goal.md', type: 'md', content: 'Research and implement a robust 2D platformer physics engine with smooth collision detection and responsive controls.' },
 ]
 
-const SAMPLE_RESEARCH_OUTPUT = `# 🔬 Research Session — "2D Platformer Physics Engine"
+const SAMPLE_ITERATIONS: ResearchIteration[] = [
+  {
+    number: 1,
+    timestamp: '2026-03-30 13:05:00',
+    actions: 'Searched web for "2D platformer physics engine best practices", "AABB collision detection tutorial", "Mario physics constants"',
+    result: 'Found that 2D platformers typically use:\n- Fixed timestep (16.67ms for 60fps)\n- AABB collision detection\n- Gravity between 980-2400 px/s²\n- Coyote time (100ms) for forgiving jumps',
+    verdict: 'better',
+    whyBetter: 'Established baseline understanding of physics parameters. Discovered optimal gravity range (1200 px/s² for Mario-like feel).',
+    confidence: 85,
+    keep: true,
+    tokensUsed: 1200,
+  },
+  {
+    number: 2,
+    timestamp: '2026-03-30 13:08:00',
+    actions: 'Searched for "swept AABB collision vs discrete", "platformer jump arc formula", "variable jump height implementation"',
+    result: 'Implemented:\n- Swept AABB for high-speed collision reliability\n- Variable jump height (hold button = higher jump)\n- Jump arc formula: height = v²/2g',
+    verdict: 'better',
+    whyBetter: 'Added swept collision which prevents tunneling at high speeds. Variable jump adds responsive feel.',
+    confidence: 78,
+    keep: true,
+    tokensUsed: 1800,
+  },
+  {
+    number: 3,
+    timestamp: '2026-03-30 13:12:00',
+    actions: 'Searched for "coyote time implementation", "game feel polish techniques", "frame perfect inputs"',
+    result: 'Added polish features:\n- Coyote time (100ms grace period after leaving platform)\n- Jump buffering (queue jump before hitting ground)\n- Acceleration/friction for smooth movement',
+    verdict: 'better',
+    whyBetter: 'These are the "secret sauce" of great platformers. Mario and Celeste use all three. Marginal improvement now requires much more research.',
+    confidence: 65,
+    keep: true,
+    tokensUsed: 2400,
+  },
+  {
+    number: 4,
+    timestamp: '2026-03-30 13:15:00',
+    actions: 'Attempted to find advanced techniques: wall jumping, dash mechanics, custom physics debuggers',
+    result: 'Found diminishing returns:\n- Wall jumping adds complexity without clear benefit for basic physics\n- Dash mechanics are separate system\n- Debug tools are implementation-specific',
+    verdict: 'same',
+    whyBetter: 'Next improvements would require 5x more tokens for 5% benefit. Stopping here is token-efficient.',
+    confidence: 90,
+    keep: false,
+    tokensUsed: 3100,
+  },
+]
 
-## Iteration #1 — Initial Analysis
-
-### What I found:
-- 2D platformer physics typically uses **AABB collision detection**
-- Most games use a **fixed timestep** physics loop (60fps = 16.67ms)
-- Gravity constants range from 980 to 2400 pixels/s² depending on feel
-
-### Key decisions:
-- Using 1200 px/s² for gravity (good for Mario-like feel)
-- Implementing **swept AABB** for reliable collision at high speeds
-- Adding coyote time (100ms) for forgiving jumps
-
-### Next steps:
-- Implement basic player movement with friction
-- Test collision with static platforms
-- Tune jump height and arc
-
----
-*Timestamp: ${new Date().toLocaleString()}*
-*Agent: MiniMax AI | Mode: Karpathy Loop v1.0*`
-
-// Icons (inline SVG)
+// Icons
 const Icons = {
   logo: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
   folder: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
@@ -59,7 +93,11 @@ const Icons = {
   play: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5,3 19,12 5,21"/></svg>,
   upload: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
   back: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15,18 9,12 15,6"/></svg>,
-  save: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>,
+  check: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20,6 9,17 4,12"/></svg>,
+  x: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  minus: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  arrow: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>,
+  brain: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12l8-8"/><circle cx="12" cy="12" r="4"/></svg>,
 }
 
 // Main Page Component
@@ -72,16 +110,17 @@ export default function HomePage() {
       goal: 'Research and implement a robust 2D platformer physics engine with smooth collision detection and responsive controls.',
       createdAt: '2026-03-29',
       updatedAt: '2026-03-30',
-      status: 'researching',
+      status: 'done',
       files: SAMPLE_FILES,
+      iterations: SAMPLE_ITERATIONS,
     },
   ])
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [newProject, setNewProject] = useState({ name: '', goal: '' })
-  const [researchOutput, setResearchOutput] = useState<string>('')
   const [isResearching, setIsResearching] = useState(false)
+  const [showIterations, setShowIterations] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load from localStorage
@@ -104,12 +143,7 @@ export default function HomePage() {
   const openProject = (project: Project) => {
     setActiveProject(project)
     setSelectedFile(null)
-    setResearchOutput('')
     setView('workspace')
-    if (project.status === 'researching' && project.files.some(f => f.name === 'research-log.md')) {
-      const log = project.files.find(f => f.name === 'research-log.md')
-      if (log?.content) setResearchOutput(log.content)
-    }
   }
 
   const goBack = () => {
@@ -130,6 +164,7 @@ export default function HomePage() {
       files: [
         { name: 'goal.md', type: 'md', content: newProject.goal },
       ],
+      iterations: [],
     }
     setProjects([project, ...projects])
     setNewProject({ name: '', goal: '' })
@@ -140,7 +175,6 @@ export default function HomePage() {
   const startResearch = () => {
     if (!activeProject) return
     setIsResearching(true)
-    // Update project status
     const updated = projects.map(p =>
       p.id === activeProject.id ? { ...p, status: 'researching' as const } : p
     )
@@ -168,9 +202,16 @@ export default function HomePage() {
     setProjects(projects.map(p => p.id === activeProject.id ? updatedProject : p))
   }
 
-  const getFileIcon = (type: string) => {
-    if (type === 'folder') return <Icons.folder />
-    return <Icons.file />
+  const getVerdictColor = (verdict: string) => {
+    if (verdict === 'better') return 'var(--success)'
+    if (verdict === 'worse') return 'var(--error)'
+    return 'var(--text-secondary)'
+  }
+
+  const getVerdictIcon = (verdict: string, keep: boolean) => {
+    if (verdict === 'better' && keep) return <Icons.check />
+    if (verdict === 'worse' || !keep) return <Icons.x />
+    return <Icons.minus />
   }
 
   // ── WORKSPACE VIEW ──────────────────────────────────────────────
@@ -195,28 +236,25 @@ export default function HomePage() {
         </header>
 
         <div className="container">
-          {/* Workspace Header */}
           <div className="workspace-header">
             <div>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>{activeProject.name}</h1>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                Last updated {activeProject.updatedAt}
+                {activeProject.iterations.length} iterations · {activeProject.status === 'done' ? 'Research complete' : 'In progress'}
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button className="btn btn-primary" onClick={startResearch} disabled={isResearching}>
-                {isResearching ? <><span className="spinner" /> Starting...</> : <><Icons.play /> Start Research</>}
+                {isResearching ? <><span className="spinner" /> Researching...</> : <><Icons.play /> Start Research</>}
               </button>
             </div>
           </div>
 
-          {/* Workspace Layout */}
           <div className="workspace-layout">
-            {/* Sidebar */}
             <div className="sidebar-section">
               <div className="sidebar-section">
                 <h4>Research Goal</h4>
-                <div className="goal-text" style={{ fontSize: '0.8rem' }}>
+                <div className="goal-text">
                   {activeProject.goal || 'No goal set'}
                 </div>
               </div>
@@ -230,109 +268,122 @@ export default function HomePage() {
                       className={`file-item ${selectedFile?.name === file.name ? 'active' : ''}`}
                       onClick={() => setSelectedFile(file)}
                     >
-                      <span className="file-icon">{getFileIcon(file.type)}</span>
+                      <span className="file-icon"><Icons.file /></span>
                       {file.name}
                     </li>
                   ))}
                 </ul>
-                <div
-                  className="upload-zone"
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={e => {
-                    e.preventDefault()
-                    // handle drop
-                  }}
-                >
+                <div className="upload-zone" onClick={() => fileInputRef.current?.click()}>
                   <Icons.upload />
-                  <div style={{ marginTop: '0.5rem' }}>Drop files or click</div>
+                  <div style={{ marginTop: '0.5rem' }}>Drop files</div>
                 </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  style={{ display: 'none' }}
-                  onChange={handleFileUpload}
-                />
+                <input ref={fileInputRef} type="file" multiple style={{ display: 'none' }} onChange={handleFileUpload} />
               </div>
-
-              {activeProject.status === 'researching' && (
-                <div className="sidebar-section">
-                  <h4>Loop Status</h4>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <span className="status-dot researching" />
-                      Iteration #1 in progress
-                    </div>
-                    <div>Goal → Search → Evaluate → Repeat</div>
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Main Panel */}
             <div className="main-panel">
               <div className="panel-header">
-                <span>{selectedFile ? selectedFile.name : 'Research Output'}</span>
-                {selectedFile && (
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    {selectedFile.type.toUpperCase()}
-                  </span>
-                )}
+                <span>Evolution History</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  {activeProject.iterations.length} iterations
+                </span>
               </div>
               <div className="panel-body">
-                {selectedFile ? (
-                  <div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                      File: {selectedFile.name}
-                    </p>
-                    <pre style={{
-                      background: 'var(--bg-secondary)',
-                      padding: '1rem',
-                      borderRadius: '8px',
-                      fontSize: '0.85rem',
-                      overflow: 'auto',
-                      maxHeight: '60vh',
-                      whiteSpace: 'pre-wrap',
-                    }}>
-                      {selectedFile.content || `[ ${selectedFile.name} — file content not loaded yet ]`}
-                    </pre>
+                {activeProject.iterations.length === 0 ? (
+                  <div className="empty-state" style={{ padding: '2rem' }}>
+                    <div style={{ marginBottom: '1rem', opacity: 0.6 }}><Icons.brain /></div>
+                    <h3>Ready to Research</h3>
+                    <p>Click "Start Research" to begin the Karpathy Loop</p>
+                    <div style={{ marginTop: '1.5rem' }}>
+                      <button className="btn btn-primary" onClick={startResearch}>
+                        <Icons.play /> Start Research
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="research-output">
-                    {researchOutput ? (
-                      <div dangerouslySetInnerHTML={{ __html: researchOutput.replace(/\n/g, '<br/>') }} />
-                    ) : (
-                      <div className="empty-state" style={{ padding: '2rem' }}>
-                        <h3>Ready to Research</h3>
-                        <p>Click "Start Research" to begin the Karpathy Loop.</p>
+                  <div>
+                    {activeProject.iterations.map((iter, idx) => (
+                      <div key={iter.number} style={{ marginBottom: '1.5rem' }}>
                         <div style={{
-                          background: 'var(--bg-secondary)',
-                          padding: '1rem',
-                          borderRadius: '8px',
-                          marginTop: '1rem',
-                          fontSize: '0.8rem',
-                          textAlign: 'left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '0.75rem',
+                          paddingBottom: '0.5rem',
+                          borderBottom: '1px solid var(--border)',
                         }}>
-                          <div style={{ fontWeight: 600, marginBottom: '0.75rem' }}>How it works:</div>
-                          <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: 1.8 }}>
-                            <li>I read your goal from goal.md</li>
-                            <li>Search web for relevant information</li>
-                            <li>Edit/expand files in this workspace</li>
-                            <li>Evaluate quality → keep best results</li>
-                            <li>Repeat until goal is achieved</li>
-                          </ol>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <span style={{
+                              background: iter.keep ? 'var(--success)' : 'var(--bg-secondary)',
+                              color: iter.keep ? '#000' : 'var(--text-secondary)',
+                              padding: '0.25rem 0.6rem',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                            }}>
+                              #{iter.number}
+                            </span>
+                            <span style={{ color: getVerdictColor(iter.verdict), fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                              {getVerdictIcon(iter.verdict, iter.keep)}
+                              {iter.verdict.toUpperCase()}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                            {iter.tokensUsed.toLocaleString()} tokens · {iter.confidence}% confidence
+                          </span>
                         </div>
-                        <button
-                          className="btn btn-primary"
-                          style={{ marginTop: '1.5rem' }}
-                          onClick={startResearch}
-                          disabled={isResearching}
-                        >
-                          <Icons.play /> {isResearching ? 'Researching...' : 'Start Research Loop'}
-                        </button>
+
+                        <div style={{ marginBottom: '0.75rem' }}>
+                          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                            What I did
+                          </div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>
+                            {iter.actions}
+                          </div>
+                        </div>
+
+                        {iter.whyBetter && (
+                          <div style={{
+                            background: iter.verdict === 'better' ? 'rgba(34, 197, 94, 0.1)' : 'var(--bg-secondary)',
+                            borderLeft: `3px solid ${getVerdictColor(iter.verdict)}`,
+                            padding: '0.75rem',
+                            borderRadius: '0 8px 8px 0',
+                            marginBottom: '0.75rem',
+                          }}>
+                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                              Verdict: Why {iter.verdict === 'better' ? 'better' : 'not improved'}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                              {iter.whyBetter}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                            Result
+                          </div>
+                          <div style={{
+                            fontSize: '0.8rem',
+                            background: 'var(--bg-secondary)',
+                            padding: '0.75rem',
+                            borderRadius: '8px',
+                            whiteSpace: 'pre-wrap',
+                            maxHeight: '150px',
+                            overflowY: 'auto',
+                            lineHeight: 1.5,
+                          }}>
+                            {iter.result}
+                          </div>
+                        </div>
+
+                        {idx < activeProject.iterations.length - 1 && (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1rem 0', color: 'var(--text-secondary)' }}>
+                            <Icons.arrow />
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </div>
@@ -369,60 +420,26 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* Create Modal */}
         {showCreate && (
-          <div style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 200,
-            padding: '1rem',
-          }} onClick={() => setShowCreate(false)}>
-            <div style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: '12px',
-              padding: '2rem',
-              width: '100%',
-              maxWidth: '500px',
-            }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '1rem' }} onClick={() => setShowCreate(false)}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
               <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem' }}>New Research Project</h2>
-
               <div className="form-group">
                 <label>Project Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Unity vs Unreal for 2D games"
-                  value={newProject.name}
-                  onChange={e => setNewProject({ ...newProject, name: e.target.value })}
-                />
+                <input type="text" placeholder="e.g. Unity vs Unreal for 2D games" value={newProject.name} onChange={e => setNewProject({ ...newProject, name: e.target.value })} />
               </div>
-
               <div className="form-group">
                 <label>Research Goal</label>
-                <textarea
-                  placeholder="What do you want me to research? Be specific about the outcome you want..."
-                  value={newProject.goal}
-                  onChange={e => setNewProject({ ...newProject, goal: e.target.value })}
-                />
+                <textarea placeholder="What do you want me to research?" value={newProject.goal} onChange={e => setNewProject({ ...newProject, goal: e.target.value })} />
               </div>
-
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                <button className="btn btn-secondary" onClick={() => setShowCreate(false)}>
-                  Cancel
-                </button>
-                <button className="btn btn-primary" onClick={createProject} disabled={!newProject.name.trim()}>
-                  Create Project
-                </button>
+                <button className="btn btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
+                <button className="btn btn-primary" onClick={createProject} disabled={!newProject.name.trim()}>Create Project</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Project Grid */}
         {projects.length > 0 ? (
           <div className="card-grid">
             {projects.map(project => (
@@ -430,7 +447,7 @@ export default function HomePage() {
                 <h3>{project.name}</h3>
                 <p>{project.goal}</p>
                 <div className="project-meta">
-                  <span>{project.files.length} files</span>
+                  <span>{project.iterations.length} iterations</span>
                   <span>{project.updatedAt}</span>
                 </div>
               </div>
@@ -446,7 +463,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Footer Note */}
         <div style={{ padding: '3rem 0', textAlign: 'center' }}>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             Zhi AutoResearch · Powered by the Karpathy Loop · No GPU required

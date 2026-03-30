@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Link Railway project
-        run: railway link ${{ secrets.RAILWAY_PROJECT_ID }}
-      - name: Deploy
-        run: railway up
+        run: railway link ${{ secrets.RAILWAY_PROJECT_ID }} || echo "Project may already be linked"
+      - name: Deploy to Railway
+        run: |
+          railway up
+          echo "Deployment completed successfully"

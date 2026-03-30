@@ -209,9 +209,9 @@ export default function HomePage() {
   }
 
   const getVerdictIcon = (verdict: string, keep: boolean) => {
-    if (verdict === 'better' && keep) return <Icons.check />
-    if (verdict === 'worse' || !keep) return <Icons.x />
-    return <Icons.minus />
+    if (verdict === 'better' && keep) return <span style={{ color: 'var(--success)' }}>✓</span>
+    if (verdict === 'worse' || !keep) return <span style={{ color: 'var(--error)' }}>✗</span>
+    return <span style={{ color: 'var(--text-secondary)' }}>−</span>
   }
 
   // ── WORKSPACE VIEW ──────────────────────────────────────────────
@@ -291,7 +291,7 @@ export default function HomePage() {
               <div className="panel-body">
                 {activeProject.iterations.length === 0 ? (
                   <div className="empty-state" style={{ padding: '2rem' }}>
-                    <div style={{ marginBottom: '1rem', opacity: 0.6 }}><Icons.brain /></div>
+                    <div style={{ marginBottom: '1rem', fontSize: '3rem', opacity: 0.3 }}>🧠</div>
                     <h3>Ready to Research</h3>
                     <p>Click "Start Research" to begin the Karpathy Loop</p>
                     <div style={{ marginTop: '1.5rem' }}>
@@ -379,7 +379,7 @@ export default function HomePage() {
 
                         {idx < activeProject.iterations.length - 1 && (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1rem 0', color: 'var(--text-secondary)' }}>
-                            <Icons.arrow />
+                            ↓
                           </div>
                         )}
                       </div>
